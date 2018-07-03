@@ -1,0 +1,150 @@
+１． compile errorが既存のモジュールとの衝突のため、やめる(依存性問題）
+OS: centos7 64bit
+
+$sudo python setup.py develop --c-core-url https://github.com/igraph/igraph/archive/master.tar.gz
+
+
+# module independencies (必要なモジュール）
+pycairo                            1.17.0
+python-igraph                      0.7.1.post6
+cairocffi                          0.8.1
+
+
+2. sudo yum install cairo cairo-devel
+
+$ pip install pycairo==1.17.0 し、以下のエラーが起きる為、先にinstallする。
+ 
+Collecting pycairo==1.17.0
+  Downloading https://files.pythonhosted.org/packages/60/47/d335364f0ca00e475a40a5a664f17691bf77b3973f999b157d56ee89e04a/pycairo-1.17.0.tar.gz (192kB)
+    100% |████████████████████████████████| 194kB 7.8MB/s
+Building wheels for collected packages: pycairo
+  Running setup.py bdist_wheel for pycairo ... error
+  Complete output from command /home/mapr/anaconda3/bin/python -u -c "import setuptools, tokenize;__file__='/tmp/pip-install-1ewn3dgz/pycairo/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" bdist_wheel -d /tmp/pip-wheel-62kbzh62 --python-tag cp36:
+  running bdist_wheel
+  running build
+  running build_py
+  creating build
+  creating build/lib.linux-x86_64-3.6
+  creating build/lib.linux-x86_64-3.6/cairo
+  copying cairo/__init__.py -> build/lib.linux-x86_64-3.6/cairo
+  copying cairo/__init__.pyi -> build/lib.linux-x86_64-3.6/cairo
+  copying cairo/py.typed -> build/lib.linux-x86_64-3.6/cairo
+  running build_ext
+  Package cairo was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `cairo.pc'
+  to the PKG_CONFIG_PATH environment variable
+  No package 'cairo' found
+  Command '['pkg-config', '--print-errors', '--exists', 'cairo >= 1.13.1']' returned non-zero exit status 1.
+
+  ----------------------------------------
+  Failed building wheel for pycairo
+  Running setup.py clean for pycairo
+Failed to build pycairo
+Installing collected packages: pycairo
+  Running setup.py install for pycairo ... error
+    Complete output from command /home/mapr/anaconda3/bin/python -u -c "import setuptools, tokenize;__file__='/tmp/pip-install-1ewn3dgz/pycairo/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" install --record /tmp/pip-record-axrrdkwg/install-record.txt --single-version-externally-managed --compile:
+    running install
+    running build
+    running build_py
+    creating build
+    creating build/lib.linux-x86_64-3.6
+    creating build/lib.linux-x86_64-3.6/cairo
+    copying cairo/__init__.py -> build/lib.linux-x86_64-3.6/cairo
+    copying cairo/__init__.pyi -> build/lib.linux-x86_64-3.6/cairo
+    copying cairo/py.typed -> build/lib.linux-x86_64-3.6/cairo
+    running build_ext
+    Package cairo was not found in the pkg-config search path.
+    Perhaps you should add the directory containing `cairo.pc'
+    to the PKG_CONFIG_PATH environment variable
+    No package 'cairo' found
+    Command '['pkg-config', '--print-errors', '--exists', 'cairo >= 1.13.1']' returned non-zero exit status 1.
+
+    ----------------------------------------
+Command "/home/mapr/anaconda3/bin/python -u -c "import setuptools, tokenize;__file__='/tmp/pip-install-1ewn3dgz/pycairo/setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '\n');f.close();exec(compile(code, __file__, 'exec'))" install --record /tmp/pip-record-axrrdkwg/install-record.txt --single-version-externally-managed --compile" failed with error code 1 in /tmp/pip-install-1ewn3dgz/pycairo/
+
+3. pip install pycairo==1.17.0
+4. pip install cairocffi==0.8.1
+5. pip install igraph==0.7.1.post6
+
+
+
+# sample source
+from igraph import *
+vertices = ["Yamada", "Tanaka", "Suzuki", "Sato", "Ito", "Obokata"]
+edges = [(0,1),(1,3),(1,4),(1,5),(2,5),(3,5),(4,3),(0,5)]
+g = Graph(vertex_attrs={"label": vertices}, edges=edges, directed=True)
+plot(g)
+
+#実行結果　error-１
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-3-b28d4525c2a0> in <module>()
+      3 edges = [(0,1),(1,3),(1,4),(1,5),(2,5),(3,5),(4,3),(0,5)]
+      4 g = Graph(vertex_attrs={"label": vertices}, edges=edges, directed=True)
+----> 5 plot(g)
+
+~/anaconda3/lib/python3.6/site-packages/igraph/drawing/__init__.py in plot(obj, target, bbox, *args, **kwds)
+    444         bbox = BoundingBox(bbox)
+    445 
+--> 446     result = Plot(target, bbox, background=kwds.get("background", "white"))
+    447 
+    448     if "margin" in kwds:
+
+~/anaconda3/lib/python3.6/site-packages/igraph/drawing/__init__.py in __init__(self, target, bbox, palette, background)
+    115         """
+    116         self._filename = None
+--> 117         self._surface_was_created = not isinstance(target, cairo.Surface)
+    118         self._need_tmpfile = False
+    119 
+
+~/anaconda3/lib/python3.6/site-packages/igraph/drawing/utils.py in __getattr__(self, _)
+    394 
+    395     def __getattr__(self, _):
+--> 396         raise TypeError("plotting not available")
+    397     def __call__(self, _):
+    398         raise TypeError("plotting not available")
+
+TypeError: plotting not available
+
+⇒ 次の2,3,4,5をインストール(pip)
+
+
+#実行結果　error-2
+---------------------------------------------------------------------------
+
+AttributeError                            Traceback (most recent call last)
+~/anaconda3/lib/python3.6/site-packages/IPython/core/formatters.py in __call__(self, obj)
+    334             method = get_real_method(obj, self.print_method)
+    335             if method is not None:
+--> 336                 return method()
+    337             return None
+    338         else:
+
+~/anaconda3/lib/python3.6/site-packages/igraph/drawing/__init__.py in _repr_svg_(self)
+    352         surface.finish()
+    353         # Return the raw SVG representation
+--> 354         return io.getvalue().encode("utf-8")
+    355 
+    356     @property
+
+AttributeError: 'bytes' object has no attribute 'encode'
+
+anaconda 下の__init__.pyの中に問題のコードを書き換える。
+
+/home/mapr/anaconda3/lib/python3.6/site-packages/igraph/drawing/__init__.py
+
+filename : __init__.py
+line no. 354
+古)
+        return io.getvalue().encode("utf-8")
+
+
+新)
+        result = io.getvalue()
+        if hasattr(result, "encode"):
+            return result.encode("utf-8")          # for Python 2.x
+        else:
+            return result.decode("utf-8")          # for Python 3.x
+
+
+問題解決！！
